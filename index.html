@@ -1,0 +1,153 @@
+
+<html>
+    <head>
+        <title> Noel Ruleta Borracha</title>
+        <link rel="stylesheet" href="main.css" type="text/css" />
+        <script type="text/javascript" src="Winwheel.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    </head>
+    <body>
+        <div align="center">
+            <h1>La ruleta loca</h1>
+     
+            <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td>
+                    <div class="power_controls">
+                        <br />
+                        <br />
+                     
+                        <br />
+                        <img id="spin_button" src="spin_on.png" alt="Spin" onClick="startSpin();" />
+                        <br /><br />
+            
+                    </div>
+                </td>
+                <td width="438" height="582" class="the_wheel" align="center" valign="center">
+                    <canvas id="canvas" width="434" height="434">
+                        <p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                    </canvas>
+                </td>
+            </tr>
+        </table>
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Create new wheel object specifying the parameters at creation time.
+            var theWheel = new Winwheel({
+                'outerRadius'     : 212,        // Set outer radius so wheel fits inside the background.
+                'innerRadius'     : 0,         // Make wheel hollow so segments don't go all way to center.
+                'textFontSize'    : 24,         // Set default font size for the segments.
+                'textOrientation' : 'vertical', // Make text vertial so goes down from the outside of wheel.
+                'textAlignment'   : 'outer',    // Align text to outside of wheel.
+                'numSegments'     : 24,         // Specify number of segments.
+                'segments'        :             // Define segments including colour and text.
+                [                               // font size and test colour overridden on backrupt segments.
+                   {'fillStyle' : '#ee1c24', 'text' : '1SHOT'},
+                   {'fillStyle' : '#3cb878', 'text' : '1 RONDA LIBRE','textFontSize' : 12},
+                   {'fillStyle' : '#f6989d', 'text' : 'DERECHA 1 SHOT', 'textFontSize' : 11},
+                   {'fillStyle' : '#00aef0', 'text' : 'IZQUIERDA 1 SHOT', 'textFontSize' : 9},
+                   {'fillStyle' : '#f26522', 'text' : 'TODOS SHOT','textFontSize' : 15},
+                   {'fillStyle' : '#000000', 'text' : 'RETO', 'textFontSize' : 19, 'textFillStyle' : '#ffffff'},
+                   {'fillStyle' : '#e70697', 'text' : 'BAILE'},
+                   {'fillStyle' : '#fff200', 'text' : '2SHOT', 'textFontSize' : 19},
+                   {'fillStyle' : '#f6989d', 'text' : 'DERECHA 1 SHOT', 'textFontSize' : 11},
+                   {'fillStyle' : '#ee1c24', 'text' : '1SHOT'},
+                   {'fillStyle' : '#3cb878', 'text' : '1 RONDA LIBRE','textFontSize' : 12},
+                   {'fillStyle' : '#f26522', 'text' : 'TODOS SHOT','textFontSize' : 15},
+                   {'fillStyle' : '#a186be', 'text' : 'SIGUIENTE', 'textFontSize' : 15},
+                   {'fillStyle' : '#fff200', 'text' : '2SHOT', 'textFontSize' : 19},
+                   {'fillStyle' : '#00aef0', 'text' : 'IZQUIERDA 1 SHOT', 'textFontSize' : 9},
+                   {'fillStyle' : '#ee1c24', 'text' : '1SHOT'},
+                   {'fillStyle' : '#f6989d', 'text' : 'DERECHA 1 SHOT', 'textFontSize' : 11},
+                   {'fillStyle' : '#f26522', 'text' : 'TODOS SHOT','textFontSize' : 15},
+                   {'fillStyle' : '#3cb878', 'text' : '1 RONDA LIBRE','textFontSize' : 12},
+                   {'fillStyle' : '#000000', 'text' : 'RETO', 'textFontSize' : 19, 'textFillStyle' : '#ffffff'},
+                   {'fillStyle' : '#a186be', 'text' : 'SIGUIENTE', 'textFontSize' : 15},
+                   {'fillStyle' : '#fff200', 'text' : '2SHOT', 'textFontSize' : 19},
+                   {'fillStyle' : '#00aef0', 'text' : 'IZQUIERDA 1 SHOT', 'textFontSize' : 9},
+                   {'fillStyle' : '#a186be', 'text' : 'SIGUIENTE', 'textFontSize' : 15}
+                ],
+                'animation' :           // Specify the animation to use.
+                {
+                    'type'     : 'spinToStop',
+                    'duration' : 8,     // Duration in seconds.
+                    'spins'    : 3,     // Default number of complete spins.
+                    'callbackFinished' : alertPrize
+                }
+            });
+
+            // Vars used by the code in this page to do power controls.
+            var wheelPower    = 0;
+            var wheelSpinning = false;
+
+            // -------------------------------------------------------
+            // Function to handle the onClick on the power buttons.
+            // -------------------------------------------------------
+            function powerSelected(powerLevel)
+            {powerLevel=3;
+                // Ensure that power can't be changed while wheel is spinning.
+                if (wheelSpinning == false)
+                {
+                    
+                    // Set wheelPower var used when spin button is clicked.
+                    wheelPower = powerLevel;
+                    // Light up the spin button by changing it's source image and adding a clickable class to it.
+                    document.getElementById('spin_button').src = "spin_on.png";
+                    document.getElementById('spin_button').className = "clickable";
+                }
+            }
+
+            // -------------------------------------------------------
+            // Click handler for spin button.
+            // -------------------------------------------------------
+            function startSpin()
+            {
+                // Ensure that spinning can't be clicked again while already running.
+                if (wheelSpinning == false)
+                {
+                    
+                    // Disable the spin button so can't click again while wheel is spinning.
+                    document.getElementById('spin_button').src       = "spin_on.png";
+                    document.getElementById('spin_button').className = "";
+
+                    // Begin the spin animation by calling startAnimation on the wheel object.
+                    theWheel.startAnimation();
+
+                    // Set to true so that power can't be changed and spin button re-enabled during
+                    // the current animation. The user will have to reset before spinning again.
+                    wheelSpinning = true;
+                }
+            }
+
+            // -------------------------------------------------------
+            // Function for reset button.
+            // -------------------------------------------------------
+            function resetWheel()
+            {
+                theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+                theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+                theWheel.draw();                // Call draw to render changes to the wheel.
+
+         
+
+                wheelSpinning = false;          // Reset to false to power buttons and spin can be clicked again.
+            }
+
+            // -------------------------------------------------------
+            // Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters.
+            // -------------------------------------------------------
+            function alertPrize(indicatedSegment)
+            {
+                // Just alert to the user what happened.
+                // In a real project probably want to do something more interesting than this with the result.
+                    alert("Te salio " + indicatedSegment.text);
+                    resetWheel();
+                
+            }
+
+
+
+        </script>
+        
+    </body>
+</html>
